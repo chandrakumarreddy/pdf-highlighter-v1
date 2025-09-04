@@ -3,7 +3,7 @@
 <h2 align="center">template-vite-react-ts-tailwind</h2>
 
 <div align="center">
-<a href="https://reactjs.org/"><image src="https://img.shields.io/static/v1?label=React&message=^18&style=for-the-badge&labelColor=FFFFFF&logo=react&color=61DAFB"/></a> <a href="https://www.typescriptlang.org/"><image src="https://img.shields.io/static/v1?label=TypeScript&message=^5&style=for-the-badge&labelColor=FFFFFF&logo=typescript&color=3178C6"/></a> <a href="https://www.typescriptlang.org/"><image src="https://img.shields.io/static/v1?label=Tailwind%20CSS&message=^3&style=for-the-badge&labelColor=FFFFFF&logo=tailwindcss&color=06B6D4"/></a> <a href="https://cn.vitejs.dev/"><image src="https://img.shields.io/static/v1?label=Vite&message=^5&style=for-the-badge&labelColor=FFFFFF&logo=vite&color=646CFF"/></a>
+<a href="https://reactjs.org/"><image src="https://img.shields.io/static/v1?label=React&message=19.1.1&style=for-the-badge&labelColor=FFFFFF&logo=react&color=61DAFB"/></a> <a href="https://www.typescriptlang.org/"><image src="https://img.shields.io/static/v1?label=TypeScript&message=5.8.3&style=for-the-badge&labelColor=FFFFFF&logo=typescript&color=3178C6"/></a> <a href="https://www.typescriptlang.org/"><image src="https://img.shields.io/static/v1?label=Tailwind%20CSS&message=4.1.12&style=for-the-badge&labelColor=FFFFFF&logo=tailwindcss&color=06B6D4"/></a> <a href="https://cn.vitejs.dev/"><image src="https://img.shields.io/static/v1?label=Vite&message=7.1.4&style=for-the-badge&labelColor=FFFFFF&logo=vite&color=646CFF"/></a>
 </div>
 
 ## Introduction
@@ -17,9 +17,9 @@ A starter [Vite](https://vitejs.dev/) template having:
 
 > [!IMPORTANT]
 > 
-> The latest code of this template has updated Vite to version 5.0+, which requires [Node.js](https://nodejs.org/) version 18+ or 20+. Please upgrade if your package manager warns about it. Or you can use [this release](https://github.com/RoyRao2333/template-vite-react-ts-tailwind/releases/tag/release-2024.01.15) which is vite@^4.
+> The latest code of this template has updated Vite to version 7.0+, which requires [Node.js](https://nodejs.org/) version 20.19+ or 22.12+. Please upgrade if your package manager warns about it. Or you can use [this release](https://github.com/RoyRao2333/template-vite-react-ts-tailwind/releases/tag/release-2025.03.27) which is vite@5 and works with Node.js 18 or 20.
 > 
-> 该模板的最新代码中，已经将 Vite 的版本更新到了 5.0+，需要 18+ 或 20+ 版本的 [Node.js](https://nodejs.org/)。当你的包管理器发出警告时，请注意升级你的 Node.js 版本。如果你需要 vite@^4，请使用[这个版本](https://github.com/RoyRao2333/template-vite-react-ts-tailwind/releases/tag/release-2024.01.15)。
+> 该模板的最新代码中，已经将 Vite 的版本更新到了 7.0+，需要 20.19+ 或 22.12+ 版本的 [Node.js](https://nodejs.org/)。当你的包管理器发出警告时，请注意升级你的 Node.js 版本。如果你需要 vite@5，请使用[这个版本](https://github.com/RoyRao2333/template-vite-react-ts-tailwind/releases/tag/release-2025.03.27)，可兼容 Node.js 18 或 20。
 
 > [!TIP]
 > 
@@ -63,7 +63,7 @@ $ pnpm run dev
 # yarn run dev
 ```
 
-> We've already implemented some recommended configurations in `eslint.config.js`, `.prettierrc.json5` and `.prettierignore`. Feel free to edit them if you have your own preferences.
+> We've already implemented some recommended configurations in `eslint.config.mjs`, `prettier.config.mjs`. Feel free to edit them if you have your own preferences.
 
 ## Contributing
 

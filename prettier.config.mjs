@@ -1,4 +1,4 @@
-{
+export default {
   trailingComma: 'all',
   tabWidth: 2,
   printWidth: 80,
@@ -14,7 +14,7 @@
   // 对非标准属性进行排序
   tailwindAttributes: ['wrapperClassName', 'wrapClassName', 'rootClassName'],
   // 对函数调用中的类进行排序
-  tailwindFunctions: ['classNames', 'classnames', 'twMerge'],
+  tailwindFunctions: ['classNames', 'classnames', 'twMerge', 'clsx'],
   overrides: [
     {
       files: '.prettierrc',
@@ -24,4 +24,4 @@
     },
   ],
   plugins: ['prettier-plugin-tailwindcss'],
-}
+};

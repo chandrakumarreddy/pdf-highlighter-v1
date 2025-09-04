@@ -1,64 +1,52 @@
 import { useState } from 'react';
-import logo from './assets/images/logo.svg';
+import reactLogo from '/react.svg';
+import viteLogo from '/vite.svg';
 
-const App = () => {
+export const App = () => {
   const [count, setCount] = useState(0);
 
   return (
-    <div className="text-center selection:bg-green-900">
-      <header className="flex min-h-screen flex-col items-center justify-center bg-[#282c34] text-white">
-        <img
-          src={logo}
-          className="animate-speed h-60 motion-safe:animate-spin"
-          alt="logo"
-        />
-        <style>
-          {
-            '\
-            .animate-speed{\
-              animation-duration:20s;\
-            }\
-          '
-          }
-        </style>
-        <p className="bg-gradient-to-r from-emerald-300 to-sky-300 bg-clip-text text-5xl font-black text-transparent selection:bg-transparent">
-          Vite + React + Typescript + Tailwindcss
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-8 text-white">
+      <div className="mb-8 flex gap-8">
+        <a href="https://vite.dev" target="_blank" rel="noopener noreferrer">
+          <img
+            src={viteLogo}
+            className="h-24 w-24 transition-all duration-300 hover:drop-shadow-[0_0_2em_#646cffaa]"
+            alt="Vite logo"
+          />
+        </a>
+        <a href="https://react.dev" target="_blank" rel="noopener noreferrer">
+          <img
+            src={reactLogo}
+            className="h-24 w-24 animate-spin transition-all duration-300 hover:drop-shadow-[0_0_2em_#61dafbaa]"
+            alt="React logo"
+            style={{ animationDuration: '20s' }}
+          />
+        </a>
+      </div>
+
+      <h1 className="mb-8 text-center text-4xl font-bold">Vite + React</h1>
+
+      <div className="mb-8 flex flex-col items-center justify-center rounded-lg bg-gray-800 p-6 shadow-lg">
+        <button
+          type="button"
+          onClick={() => setCount((count) => count + 1)}
+          className="mb-4 rounded bg-gray-700 px-4 py-2 font-medium text-white transition-colors duration-200 hover:bg-gray-600"
+        >
+          count is {count}
+        </button>
+        <p className="text-gray-300">
+          Edit{' '}
+          <code className="rounded bg-gray-700 px-2 py-1 text-yellow-300">
+            src/App.tsx
+          </code>{' '}
+          and save to test HMR
         </p>
-        <p className="mt-3">
-          <button
-            type="button"
-            className="my-6 rounded bg-gray-300 px-2 py-2 text-[#282C34] transition-all hover:bg-gray-200"
-            onClick={() => setCount((count) => count + 1)}
-          >
-            count is: {count}
-          </button>
-        </p>
-        <p>
-          Edit <code className="text-[#8d96a7]">App.tsx</code> and save to test
-          HMR updates.
-        </p>
-        <p className="mt-3 flex gap-3 text-center text-[#8d96a7]">
-          <a
-            className="text-[#61dafb] transition-all hover:text-blue-400"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          {' | '}
-          <a
-            className="text-[#61dafb] transition-all hover:text-blue-400"
-            href="https://vitejs.dev/guide/features.html"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Vite Docs
-          </a>
-        </p>
-      </header>
+      </div>
+
+      <p className="text-center text-gray-400">
+        Click on the Vite and React logos to learn more
+      </p>
     </div>
   );
 };
-
-export default App;
