@@ -9,21 +9,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-  globalIgnores([
-    'dist',
-    'node_modules',
-    'scripts/*',
-    'config/*',
-    'pnpm-lock.yaml',
-    'pnpm-workspace.yaml',
-    '.DS_Store',
-    'package.json',
-    'tsconfig.json',
-    '**/*.md',
-    'build',
-    '.eslintrc.cjs',
-    'eslint.config.js',
-  ]),
+  globalIgnores(['dist', 'node_modules', 'build', 'eslint.config.mjs']),
   {
     files: ['**/*.{ts,tsx}'],
     plugins: {
