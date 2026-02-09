@@ -6,6 +6,9 @@ import eslint from 'vite-plugin-eslint2';
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    port: 8000,
+  },
   plugins: [react(), tailwindcss(), eslint()],
   resolve: {
     alias: {
