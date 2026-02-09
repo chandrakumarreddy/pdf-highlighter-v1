@@ -34,12 +34,12 @@ const LINE_Y_TOLERANCE = 3; // Pixels to group nodes into the same visual line
 
 // --- VIRTUALIZED PDF PAGE COMPONENT ---
 
-const VirtualPage = memo(
+const VirtualPage = memo<VirtualPageProps>(
   ({ pageNum, pdfDoc, selections, excludedNodes, onSelect, onExclude }) => {
-    const containerRef = useRef(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
-    const renderTaskRef = useRef(null);
+    const renderTaskRef = useRef<any>(null);
 
     useEffect(() => {
       const observer = new IntersectionObserver(
@@ -76,13 +76,14 @@ const VirtualPage = memo(
         container.appendChild(textLayer);
 
         const ctx = canvas.getContext('2d');
+        if (!ctx) return;
         renderTaskRef.current = page.render({ canvasContext: ctx, viewport });
         await renderTaskRef.current.promise;
 
         const textContent = await page.getTextContent();
         const fragment = document.createDocumentFragment();
 
-        textContent.items.forEach((item, idx) => {
+        textContent.items.forEach((item: any, idx: number) => {
           const tx = window.pdfjsLib.Util.transform(
             viewport.transform,
             item.transform,
@@ -143,8 +144,9 @@ const VirtualPage = memo(
     useEffect(() => {
       if (!isLoaded || !containerRef.current) return;
       const nodes = containerRef.current.querySelectorAll('.text-node');
-      nodes.forEach((n) => {
+      nodes.forEach((n: Element) => {
         const nodeId = n.getAttribute('data-node-id');
+        if (!nodeId) return;
         const isExcluded = excludedNodes.includes(nodeId);
         const isSelected = selections.nodeIds.has(nodeId);
 
@@ -171,8 +173,8 @@ const VirtualPage = memo(
         ref={containerRef}
         className="relative mx-auto mb-8 min-h-[500px] overflow-hidden rounded-sm border border-slate-300 bg-white shadow-md"
         onClick={(e) => {
-          const target = e.target.closest('.text-node');
-          if (target) onSelect(target.getAttribute('data-node-id'));
+          const target = (e.target as Element).closest('.text-node');
+          if (target) onSelect((target as Element).getAttribute('data-node-id') || '');
         }}
       />
     );
@@ -181,10 +183,10 @@ const VirtualPage = memo(
 
 // --- DOCX VIEWER COMPONENT ---
 
-const DocxViewer = memo(
+const DocxViewer = memo<DocxViewerProps>(
   ({ buffer, selections, excludedNodes, onSelect, onExclude }) => {
-    const containerRef = useRef(null);
-    const [error, setError] = useState(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const [error, setError] = useState<string | null>(null);
     const [isRendered, setIsRendered] = useState(false);
     const isMountedRef = useRef(false);
 
@@ -195,25 +197,29 @@ const DocxViewer = memo(
       };
     }, []);
 
-    // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
     useEffect(() => {
       if (containerRef.current && buffer) {
         if (!window.docx) {
+          // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
           if (isMountedRef.current) setError('Word viewer engine not ready');
           return;
         }
+        // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
         if (isMountedRef.current) setIsRendered(false);
         containerRef.current.innerHTML = '';
         window.docx
           .renderAsync(buffer, containerRef.current)
           .then(() => {
-            const containerRect = containerRef.current.getBoundingClientRect();
-            const blocks = containerRef.current.querySelectorAll(
+            const container = containerRef.current;
+            if (!container) return;
+            const containerRect = container.getBoundingClientRect();
+            const blocks = container.querySelectorAll(
               'p, td, h1, h2, h3, h4, h5, h6',
             );
-            blocks.forEach((el, idx) => {
-              if (el.innerText && el.innerText.trim().length > 0) {
-                const rect = el.getBoundingClientRect();
+            blocks.forEach((el: Element, idx: number) => {
+              const htmlEl = el as HTMLElement;
+              if (htmlEl.innerText && htmlEl.innerText.trim().length > 0) {
+                const rect = htmlEl.getBoundingClientRect();
                 const relX = Math.round(rect.left - containerRect.left);
                 el.setAttribute('data-docx-x', relX.toString());
                 el.setAttribute('data-node-id', `docx-node-${idx}`);
@@ -223,16 +229,18 @@ const DocxViewer = memo(
                   'transition-all',
                   'rounded-sm',
                 );
-                el.style.position = 'relative';
-                el.querySelectorAll('span').forEach(
-                  (s) => (s.style.pointerEvents = 'none'),
+                htmlEl.style.position = 'relative';
+                htmlEl.querySelectorAll('span').forEach(
+                  (s: any) => (s.style.pointerEvents = 'none'),
                 );
               }
             });
+            // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
             if (isMountedRef.current) setIsRendered(true);
           })
-          .catch((err) => {
+          .catch((err: unknown) => {
             console.error('Docx render error:', err);
+            // eslint-disable-next-line @eslint-react/hooks-extra/no-direct-set-state-in-use-effect
             if (isMountedRef.current) setError('Failed to render Word document');
           });
       }
@@ -242,8 +250,9 @@ const DocxViewer = memo(
       if (!isRendered || !containerRef.current) return;
       const elements =
         containerRef.current.querySelectorAll('.docx-selectable');
-      elements.forEach((el) => {
+      elements.forEach((el: Element) => {
         const nodeId = el.getAttribute('data-node-id');
+        if (!nodeId) return;
         const isExcluded = excludedNodes.includes(nodeId);
         const isSelected = selections.nodeIds.has(nodeId);
 
@@ -251,8 +260,9 @@ const DocxViewer = memo(
         if (existingBtn) existingBtn.remove();
 
         if (isSelected && !isExcluded) {
-          el.style.backgroundColor = 'rgba(234, 179, 8, 0.25)';
-          el.style.boxShadow = 'inset 0 0 0 1px #ca8a04';
+          const htmlEl = el as HTMLElement;
+          htmlEl.style.backgroundColor = 'rgba(234, 179, 8, 0.25)';
+          htmlEl.style.boxShadow = 'inset 0 0 0 1px #ca8a04';
           const btn = document.createElement('div');
           btn.className =
             'docx-remove-btn absolute -top-1 -right-1 hidden bg-rose-500 text-white rounded-full p-0.5 z-50 pointer-events-auto shadow-sm animate-in zoom-in duration-200';
@@ -266,15 +276,16 @@ const DocxViewer = memo(
           };
           el.appendChild(btn);
         } else {
-          el.style.backgroundColor = '';
-          el.style.boxShadow = '';
+          const htmlEl = el as HTMLElement;
+          htmlEl.style.backgroundColor = '';
+          htmlEl.style.boxShadow = '';
         }
       });
     }, [isRendered, selections, excludedNodes, onExclude]);
 
-    const handleDocxClick = (e) => {
-      const target = e.target.closest('.docx-selectable');
-      if (target) onSelect(target.getAttribute('data-node-id'));
+    const handleDocxClick = (e: React.MouseEvent) => {
+      const target = (e.target as Element).closest('.docx-selectable');
+      if (target) onSelect((target as Element).getAttribute('data-node-id') || '');
     };
 
     if (error)
@@ -301,38 +312,87 @@ const DocxViewer = memo(
   },
 );
 
+// --- TYPES ---
+
+interface UploadedFile {
+  id: string;
+  name: string;
+  type: 'PDF' | 'XLSX' | 'DOCX';
+  buffer: ArrayBuffer;
+}
+
+interface ExcelSheet {
+  name: string;
+  data: Record<string, unknown>[];
+}
+
+interface Selections {
+  type: 'PDF' | 'XLSX' | 'DOCX' | null;
+  nodeIds: Set<string>;
+  indices: Record<number, number[]>;
+}
+
+interface NodeLookup {
+  id: string;
+  x: number;
+  y: number;
+  fontSize: number;
+  text: string;
+  page: number;
+}
+
+interface VirtualPageProps {
+  pageNum: number;
+  pdfDoc: any;
+  selections: Selections;
+  excludedNodes: string[];
+  onSelect: (id: string) => void;
+  onExclude: (nodeId: string) => void;
+}
+
+interface DocxViewerProps {
+  buffer: ArrayBuffer | null;
+  selections: Selections;
+  excludedNodes: string[];
+  onSelect: (id: string) => void;
+  onExclude: (nodeId: string) => void;
+}
+
 // --- MAIN APPLICATION ---
 
 const App = () => {
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [activeFileId, setActiveFileId] = useState(null);
-  const [fileType, setFileType] = useState(null);
-  const [pdfDoc, setPdfDoc] = useState(null);
-  const [numPages, setNumPages] = useState(0);
-  const [excelSheets, setExcelSheets] = useState([]);
-  const [docxBuffer, setDocxBuffer] = useState(null);
-  const [activeSheetIndex, setActiveSheetIndex] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [selections, setSelections] = useState(() => ({
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [activeFileId, setActiveFileId] = useState<string | null>(null);
+  const [fileType, setFileType] = useState<'PDF' | 'XLSX' | 'DOCX' | null>(null);
+  const [pdfDoc, setPdfDoc] = useState<any>(null);
+  const [numPages, setNumPages] = useState<number>(0);
+  const [excelSheets, setExcelSheets] = useState<ExcelSheet[]>([]);
+  const [docxBuffer, setDocxBuffer] = useState<ArrayBuffer | null>(null);
+  const [activeSheetIndex, setActiveSheetIndex] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [selections, setSelections] = useState<Selections>(() => ({
     type: null,
     nodeIds: new Set(),
     indices: {},
   }));
-  const [excludedNodes, setExcludedNodes] = useState([]);
+  const [excludedNodes, setExcludedNodes] = useState<string[]>([]);
 
-  const structuralTensorsRef = useRef(null);
-  const nodeLookupRef = useRef([]);
-  const fileInputRef = useRef(null);
+  const structuralTensorsRef = useRef<any>(null);
+  const nodeLookupRef = useRef<NodeLookup[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    const loadScript = (src, id) =>
-      new Promise((resolve) => {
-        if (document.getElementById(id)) return resolve();
+    const loadScript = (src: string, id: string): Promise<void> =>
+      new Promise<void>((resolve) => {
+        if (document.getElementById(id)) {
+          resolve();
+          return;
+        }
         const script = document.createElement('script');
         script.src = src;
         script.id = id;
         script.async = false;
-        script.onload = resolve;
+        script.onload = () => resolve();
         document.head.appendChild(script);
       });
 
@@ -349,14 +409,14 @@ const App = () => {
   }, []);
 
   // --- TFJS STRUCTURAL PATTERN ENGINE ---
-  const buildStructuralMap = async (pdfInstance) => {
+  const buildStructuralMap = async (pdfInstance: any) => {
     if (!window.tf || !pdfInstance) return;
-    const nodes = [];
+    const nodes: NodeLookup[] = [];
 
     for (let p = 1; p <= pdfInstance.numPages; p++) {
       const page = await pdfInstance.getPage(p);
       const textContent = await page.getTextContent();
-      textContent.items.forEach((item, idx) => {
+      textContent.items.forEach((item: any, idx: number) => {
         if (item.str.trim().length === 0) return;
         nodes.push({
           id: `pdf-${p}-${idx}`,
@@ -384,7 +444,7 @@ const App = () => {
     }
   };
 
-  const switchToFile = async (fileEntry) => {
+  const switchToFile = async (fileEntry: UploadedFile) => {
     setLoading(true);
     setActiveFileId(fileEntry.id);
     setFileType(fileEntry.type);
@@ -425,7 +485,7 @@ const App = () => {
     setLoading(false);
   };
 
-  const performPatternMatch = (seedNodeId) => {
+  const performPatternMatch = (seedNodeId: string) => {
     if (fileType === 'PDF') {
       const seedIdx = nodeLookupRef.current.findIndex(
         (n) => n.id === seedNodeId,
@@ -445,7 +505,7 @@ const App = () => {
         const newIds = new Set(selections.nodeIds);
         const activeLines = new Set();
 
-        similarity.forEach((score, idx) => {
+        similarity.forEach((score: number, idx: number) => {
           if (score > SIMILARITY_THRESHOLD) {
             const node = nodeLookupRef.current[idx];
             activeLines.add(`${node.page}-${node.y}`);
@@ -463,37 +523,45 @@ const App = () => {
 
     if (fileType === 'DOCX') {
       const container = document.querySelector('.docx-container');
-      const targetEl = container?.querySelector(
+      if (!container) return;
+      const targetEl = container.querySelector(
         `[data-node-id="${seedNodeId}"]`,
       );
       if (!targetEl) return;
 
-      const targetX = parseInt(targetEl.getAttribute('data-docx-x'));
+      const targetXAttr = targetEl.getAttribute('data-docx-x');
+      if (!targetXAttr) return;
+      const targetX = parseInt(targetXAttr);
       const allSelectable = container.querySelectorAll('.docx-selectable');
       const newIds = new Set(selections.nodeIds);
 
       allSelectable.forEach((el) => {
-        const x = parseInt(el.getAttribute('data-docx-x'));
-        if (Math.abs(x - targetX) < X_MATCH_TOLERANCE) {
-          newIds.add(el.getAttribute('data-node-id'));
+        const xAttr = el.getAttribute('data-docx-x');
+        if (xAttr) {
+          const x = parseInt(xAttr);
+          if (Math.abs(x - targetX) < X_MATCH_TOLERANCE) {
+            const nodeId = el.getAttribute('data-node-id');
+            if (nodeId) newIds.add(nodeId);
+          }
         }
       });
       setSelections((prev) => ({ ...prev, type: 'DOCX', nodeIds: newIds }));
     }
   };
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
     setLoading(true);
-    const ext = file.name.split('.').pop().toLowerCase();
-    const type = ext === 'xlsx' ? 'XLSX' : ext.includes('doc') ? 'DOCX' : 'PDF';
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    const type: 'PDF' | 'XLSX' | 'DOCX' =
+      ext === 'xlsx' ? 'XLSX' : ext?.includes('doc') ? 'DOCX' : 'PDF';
     const buffer = await file.arrayBuffer();
     const id = Math.random().toString(36).substr(2, 9);
-    const newFile = { id, name: file.name, type, buffer };
+    const newFile: UploadedFile = { id, name: file.name, type, buffer };
     setUploadedFiles((prev) => [...prev, newFile]);
     switchToFile(newFile);
-    e.target.value = null;
+    e.target.value = '';
   };
 
   const activeFileNameStr = useMemo(() => {
@@ -684,18 +752,15 @@ const App = () => {
                     <tr className="bg-[#f8fafc]">
                       <th className="sticky left-0 z-50 h-7 w-10 border border-slate-300 bg-[#f8fafc]"></th>
                       {excelSheets[activeSheetIndex]?.data[0] &&
-                        Array.from({
-                          length: Object.keys(
-                            excelSheets[activeSheetIndex].data[0],
-                          ).length,
-                        }).map((_, i) => {
-                          const isSelected =
-                            selections.type === 'XLSX' &&
-                            selections.indices?.[activeSheetIndex]?.includes(i);
-                          return (
-                            <th
-                              key={`col-${i}`}
-                              onClick={() => {
+                        Object.keys(excelSheets[activeSheetIndex].data[0]).map(
+                          (colKey, i) => {
+                            const isSelected =
+                              selections.type === 'XLSX' &&
+                              selections.indices?.[activeSheetIndex]?.includes(i);
+                            return (
+                              <th
+                                key={colKey}
+                                onClick={() => {
                                 setSelections((prev) => {
                                   const cur =
                                     prev.indices?.[activeSheetIndex] || [];
@@ -726,11 +791,11 @@ const App = () => {
                   <tbody>
                     {(excelSheets[activeSheetIndex]?.data || []).map(
                       (row, rIdx) => (
-                        <tr key={`row-${rIdx}`} className="group/row h-8">
+                        <tr key={`xlsx-row-${activeSheetIndex}-${rIdx}`} className="group/row h-8">
                           <td className="sticky left-0 z-20 flex h-8 w-10 items-center justify-center border border-slate-300 bg-[#f8fafc] text-center text-[10px]">
                             <span>{rIdx + 1}</span>
                           </td>
-                          {Object.values(row).map((cell, cIdx) => {
+                          {Object.entries(row).map(([colKey, cell], cIdx) => {
                             const isSelectedCol =
                               selections.type === 'XLSX' &&
                               selections.indices?.[activeSheetIndex]?.includes(
@@ -739,7 +804,7 @@ const App = () => {
                             const cellStr = cell ? String(cell).trim() : '';
                             return (
                               <td
-                                key={`row-${rIdx}-col-${cIdx}`}
+                                key={`xlsx-cell-${activeSheetIndex}-${rIdx}-${colKey}`}
                                 className={`truncate border border-slate-200 px-3 py-1 text-[12px] transition-all ${isSelectedCol && cellStr ? 'bg-amber-50/50 font-medium ring-1 ring-amber-400 ring-inset' : 'bg-white'}`}
                               >
                                 {cellStr}
